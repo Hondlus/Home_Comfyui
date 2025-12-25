@@ -24,6 +24,10 @@ class QwenImageEditPlus:
     def INPUT_TYPES(cls):
         return {
             "required": {
+                "model": (["qwen-image-edit-plus", "qwen-image-edit"], {
+                    "default": "qwen-image-edit",
+                    "label": "选择模型"
+                }),
                 "image1": ("IMAGE", {
                     "label": "图像1 (必填)"
                 }),
@@ -128,7 +132,7 @@ class QwenImageEditPlus:
         except Exception as e:
             raise Exception(f"下载图像失败: {str(e)}")
     
-    def generate_images(self, image1, prompt, api_key, num_outputs, 
+    def generate_images(self, model, image1, prompt, api_key, num_outputs, 
                        image2=None, image3=None, negative_prompt="低质量",
                        prompt_extend="true", watermark="false", region="beijing", seed=-1):
         
@@ -186,7 +190,7 @@ class QwenImageEditPlus:
         # 准备调用参数
         call_kwargs = {
             "api_key": api_key,
-            "model": "qwen-image-edit-plus",
+            "model": model,
             "messages": messages,
             "stream": False,
             "n": num_outputs,
@@ -211,7 +215,7 @@ class QwenImageEditPlus:
         
         # 调用API
         try:
-            print(f"正在调用Qwen Image Edit Plus API，生成 {num_outputs} 张图像...")
+            print(f"正在调用 {model} API，生成 {num_outputs} 张图像...")
             response = MultiModalConversation.call(**call_kwargs)
             
             if response.status_code == 200:
@@ -300,7 +304,7 @@ class QwenImageEdit3Inputs:
     CATEGORY = "🦊 Qwen/Image Edit"
     OUTPUT_IS_LIST = (True,)
     
-    def generate_images(self, image1, image2, image3, prompt, api_key, num_outputs, 
+    def generate_images(self, model, image1, image2, image3, prompt, api_key, num_outputs, 
                        negative_prompt="低质量"):
         """简化版本，专为3张输入图像设计"""
         if not DASHSCOPE_AVAILABLE:
@@ -348,11 +352,11 @@ class QwenImageEdit3Inputs:
         
         # 使用最简化的参数调用
         try:
-            print(f"正在调用Qwen Image Edit Plus API，使用3张输入图像生成 {num_outputs} 张输出...")
+            print(f"正在调用 {model} API，使用3张输入图像生成 {num_outputs} 张输出...")
             
             response = MultiModalConversation.call(
                 api_key=api_key,
-                model="qwen-image-edit-plus",
+                model=model,
                 messages=messages,
                 stream=False,
                 n=num_outputs,
@@ -456,7 +460,7 @@ class QwenImageEditFlexible:
     CATEGORY = "🦊 Qwen/Image Edit"
     OUTPUT_IS_LIST = (True,)
     
-    def generate_images(self, prompt, api_key, num_outputs, 
+    def generate_images(self, model, prompt, api_key, num_outputs, 
                        image1=None, image2=None, image3=None,
                        negative_prompt="低质量"):
         """灵活版本，支持1-3张输入图像"""
@@ -511,7 +515,7 @@ class QwenImageEditFlexible:
             
             response = MultiModalConversation.call(
                 api_key=api_key,
-                model="qwen-image-edit-plus",
+                model=model,
                 messages=messages,
                 stream=False,
                 n=num_outputs,
